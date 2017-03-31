@@ -31,5 +31,5 @@ gradeData = AssessRisk(gradeData)
 #output the risk table to "J:/IdentifyAtRisk/StudentRiskTable.xlsx"
 CreateOutput(gradeData)
 
-
+str(gradeData)
 
