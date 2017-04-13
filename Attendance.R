@@ -31,7 +31,8 @@ library(openxlsx)
 #WhoModifiedType (ver7.8.0) Varchar(1) Indicates the type of user that modified the record. Valid values: a = admin, t = teacher, p = parent, s = student, u = substitute, m = maintenance, ? = unknown.
 #YearID (ver4.0.0) Number(10,0) A number representing which year the term belongs to, such as 13 for 2003-2004. The number is equal to the ID of the year term divided by 100. Maintained in the Terms table. Indexed.  
 
-
+#From PowerSchool, export the Attendance (157) and AttendanceCodes tables and put them in the attendance_export.xlsx workbook
+#Filter the Attendance export by YearID using the the current year ID (26 for 2016-2016, add 1 for each additional year)
 
 d1 = read.xlsx("attendance_export.xlsx", "Att")
 d2 = read.xlsx("attendance_export.xlsx", "AttendanceCodes")
@@ -40,10 +41,9 @@ students = data.frame(studentNumber = unique(d1$`[1]Student_Number`))
 students$name = d1$`[1]LastFirst`[match(students$studentNumber,d1$`[1]Student_Number`)]
 statuses = unique(d1$Desc[d1$Att_Mode_Code == "ATT_ModeMeeting"])
 
-for(i in statuses){
-  students[,i] = NA_integer_
-}
+students[,statuses] = NA_integer_
 
+#count how many times each student has each kind of attendance code
 for(i in 1:nrow(students)){
   for(j in statuses){
     students[i,j] = sum(d1$`[1]Student_Number` == students$studentNumber[i] & d1$Desc == j & d1$Att_Mode_Code == "ATT_ModeMeeting")
@@ -60,7 +60,6 @@ students[students$`ISS Absent unexcused` > 100,]
 
 unique(d1$`[1]LastFirst`[d1$Desc == "Expelled"])
 
-
 str(students)
 
 
@@ -68,4 +67,10 @@ str(students)
 write.csv(x = students[order(students$`Absence Unexcused`, decreasing = T),1:3], file = "attendance_issues.csv")
 
 
+
+#AFTER doing the stuff in RiskandAttendance.R
+str(students)
+HighRiskList = students[order(students$attendanceRiskz, decreasing = T),c(1,2,6,15)]
+HighRiskList = HighRiskList[1:30,]
+write.csv(x = HighRiskList, file = "HighRiskAttendance.csv")
 
