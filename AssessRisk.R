@@ -1,6 +1,6 @@
 #AssessRisk.R
 
-AssessRisk = function (gradeData){
+AssessRisk = function (gradeData, minFcount = 2, DropSeniors = T){
   storedgrades = gradeData$storedgrades
   currentgrades = gradeData$currentgrades
   
@@ -29,8 +29,13 @@ AssessRisk = function (gradeData){
     student.df$TotalFs[i] = sum(currentgrades$RiskScore > 0 & currentgrades$`St.#` == student.df$id[i])
   }
   
-  student.df2 = student.df[student.df$GradeLevel < 12,]  #limit to grades 9-11
-  student.df2 = student.df2[student.df2$TotalFs > 2,c(2,1,3,5,4)]  #limit to students who are failing at least 3 classes
+  #limit to grades 9-11?
+  if(DropSeniors){
+    student.df2 = student.df[student.df$GradeLevel < 12,]
+  }  else {
+    student.df2 = student.df
+  }
+  student.df2 = student.df2[student.df2$TotalFs >= minFcount,c(2,1,3,5,4)]  #limit to students who are failing at least minFcount classes
   student.df2 = student.df2[order(student.df2$TotalRisk),]
   
   
