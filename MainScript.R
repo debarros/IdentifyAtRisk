@@ -9,7 +9,7 @@
 # Failing by 10-20 pts - 2 risk pts
 # Failing by >20 pts - 3 risk pts
 
-#The grades on which the student's risk scores are based are estimated using Q1, Q2, and E1 stored grades and Q3 current grades
+#The grades on which the student's risk scores are based are estimated using the stored grades from prior terms and the current grades from the current term
 #The stored grades table should be exported (from DDE in PowerSchool) for the current year and put in the Stored tab of the 'at risk grade data.xlsx' file
 #To fill in the Current tab of the 'at risk grade data.xlsx' file, export the csv from the Percent Grades Report (under custom reports in PowerSchool)
 
@@ -26,10 +26,15 @@ gradeData = LoadData("J:/IdentifyAtRisk/at risk grade data.xlsx") #if the data i
 gradeData = EstimateGrades(gradeData, CurrentQuarter)
 
 #Get the grading scales, calculate risk scores, and create the student risk table
-gradeData = AssessRisk(gradeData)
+#This may launch a browser window for you to sign into google
+gradeData = AssessRisk(gradeData, minFcount = 0, DropSeniors = F)
 
 #output the risk table to "J:/IdentifyAtRisk/StudentRiskTable.xlsx"
 CreateOutput(gradeData)
+
+#Output a table with all the students with a particular number of F's
+ByNumberOfFs(gradeData, Fcount = 3)
+  
 
 str(gradeData)
 
